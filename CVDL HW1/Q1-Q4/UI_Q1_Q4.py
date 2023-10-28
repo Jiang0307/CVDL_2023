@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'HW1OwZAcI.ui'
-##
-## Created by: Qt User Interface Compiler version 6.6.0
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -113,15 +103,15 @@ class UI(object):
 
         self.verticalLayout_7.addWidget(self.groupBox_3)
 
-        self.pushButton = QPushButton(self.verticalLayoutWidget_2)
-        self.pushButton.setObjectName(u"pushButton")
+        self.find_distortion_pushButton = QPushButton(self.verticalLayoutWidget_2)
+        self.find_distortion_pushButton.setObjectName(u"find_distortion_pushButton")
 
-        self.verticalLayout_7.addWidget(self.pushButton)
+        self.verticalLayout_7.addWidget(self.find_distortion_pushButton)
 
-        self.pushButton_2 = QPushButton(self.verticalLayoutWidget_2)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.show_undistorted_result_pushButton = QPushButton(self.verticalLayoutWidget_2)
+        self.show_undistorted_result_pushButton.setObjectName(u"show_undistorted_result_pushButton")
 
-        self.verticalLayout_7.addWidget(self.pushButton_2)
+        self.verticalLayout_7.addWidget(self.show_undistorted_result_pushButton)
 
 
         self.horizontalLayout_2.addWidget(self.groupBox_2)
@@ -276,8 +266,8 @@ class UI(object):
         self.find_intrinsic_pushButton.setText(QCoreApplication.translate("MainWindow", u"1.2 Find intrinsic", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"1.3 Find extrinsic", None))
         self.find_extrinsic_pushButton.setText(QCoreApplication.translate("MainWindow", u"Find extrinsic", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"1.4 Find distortion", None))
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"1.5 Show result", None))
+        self.find_distortion_pushButton.setText(QCoreApplication.translate("MainWindow", u"1.4 Find distortion", None))
+        self.show_undistorted_result_pushButton.setText(QCoreApplication.translate("MainWindow", u"1.5 Show result", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("MainWindow", u"2. Augmented reality", None))
         self.show_words_vertical_pushButton.setText(QCoreApplication.translate("MainWindow", u"2.2 show words vertical", None))
         self.show_words_on_board_l_pushButton.setText(QCoreApplication.translate("MainWindow", u"2.1 show words on board", None))

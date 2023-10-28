@@ -180,14 +180,14 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton">
+             <widget class="QPushButton" name="find_distortion_pushButton">
               <property name="text">
                <string>1.4 Find distortion</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_2">
+             <widget class="QPushButton" name="show_undistorted_result_pushButton">
               <property name="text">
                <string>1.5 Show result</string>
               </property>
