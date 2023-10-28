@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>912</width>
+    <height>599</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>200</width>
+    <height>250</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>901</width>
+      <height>571</height>
+     </rect>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget_8">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>911</width>
+       <height>571</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="minimumSize">
+           <size>
+            <width>161</width>
+            <height>211</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>Load Image</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QWidget" name="verticalLayoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>40</x>
+             <y>20</y>
+             <width>131</width>
+             <height>231</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="load_foler_pushButton">
+              <property name="text">
+               <string>Load folder</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="load_image_l_pushButton">
+              <property name="text">
+               <string>Load Image_L</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="load_image_r_pushButton">
+              <property name="text">
+               <string>Load Image_R</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>1. Classification</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QWidget" name="verticalLayoutWidget_2">
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>20</y>
+             <width>151</width>
+             <height>231</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QPushButton" name="find_corners_pushButton">
+              <property name="text">
+               <string>1.1 Find corners</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="find_intrinsic_pushButton">
+              <property name="text">
+               <string>1.2 Find intrinsic</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_3">
+              <property name="title">
+               <string>1.3 Find extrinsic</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <widget class="QWidget" name="verticalLayoutWidget_7">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>20</y>
+                 <width>131</width>
+                 <height>81</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_8">
+                <item>
+                 <widget class="QComboBox" name="comboBox">
+                  <property name="maxVisibleItems">
+                   <number>15</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="find_extrinsic_pushButton">
+                  <property name="text">
+                   <string>Find extrinsic</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>1.4 Find distortion</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="text">
+               <string>1.5 Show result</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_6">
+          <property name="minimumSize">
+           <size>
+            <width>161</width>
+            <height>211</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>2. Augmented reality</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QPushButton" name="show_words_vertical_pushButton">
+           <property name="geometry">
+            <rect>
+             <x>41</x>
+             <y>186</y>
+             <width>151</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>2.2 show words vertical</string>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="lineEdit">
+           <property name="geometry">
+            <rect>
+             <x>41</x>
+             <y>58</y>
+             <width>141</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="show_words_on_board_l_pushButton">
+           <property name="geometry">
+            <rect>
+             <x>41</x>
+             <y>120</y>
+             <width>149</width>
+             <height>24</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>2.1 show words on board</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_5">
+          <property name="minimumSize">
+           <size>
+            <width>161</width>
+            <height>211</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>3. Stereo disparity map</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QWidget" name="verticalLayoutWidget_4">
+           <property name="geometry">
+            <rect>
+             <x>24</x>
+             <y>20</y>
+             <width>171</width>
+             <height>231</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="stereo_disparity_map_pushButton">
+              <property name="text">
+               <string>3.1 stereo disparity map</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QGroupBox" name="groupBox_7">
+          <property name="minimumSize">
+           <size>
+            <width>161</width>
+            <height>211</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>4. SIFT</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QWidget" name="verticalLayoutWidget_6">
+           <property name="geometry">
+            <rect>
+             <x>40</x>
+             <y>20</y>
+             <width>140</width>
+             <height>231</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="load_image1_pushButton">
+              <property name="text">
+               <string>Load Image1</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="load_image2_pushButton">
+              <property name="text">
+               <string>Load Image2</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="keypoints_pushButton">
+              <property name="text">
+               <string>4.1 Keypoints</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="matched_keypoints_pushButton">
+              <property name="text">
+               <string>4.2 Matched keypoints</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>800</width>
+            <height>600</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>3. Stereo disparity map</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QWidget" name="verticalLayoutWidget_3">
+           <property name="geometry">
+            <rect>
+             <x>120</x>
+             <y>30</y>
+             <width>173</width>
+             <height>221</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_11">
+            <item>
+             <widget class="QPushButton" name="load_image_pushButton">
+              <property name="text">
+               <string>Load Image</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="show_augmented_images_pushButton">
+              <property name="text">
+               <string>5.1 Show augmented images</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="show_model_structure_pushButton">
+              <property name="text">
+               <string>5.2 Show model structure</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="show_acc_and_loss_pushButton">
+              <property name="text">
+               <string>5.3 Show acc and loss</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QPushButton" name="inference_pushButton">
+           <property name="geometry">
+            <rect>
+             <x>420</x>
+             <y>20</y>
+             <width>200</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>5.4 Inference</string>
+           </property>
+          </widget>
+          <widget class="QGraphicsView" name="graphicsView">
+           <property name="geometry">
+            <rect>
+             <x>420</x>
+             <y>50</y>
+             <width>200</width>
+             <height>200</height>
+            </rect>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>912</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
