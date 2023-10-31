@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+
+################################################################################
+## Form generated from reading UI file 'HW1ypdhhr.ui'
+##
+## Created by: Qt User Interface Compiler version 6.6.0
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
+
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -132,9 +142,9 @@ class UI(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lineEdit.sizePolicy().hasHeightForWidth())
         self.lineEdit.setSizePolicy(sizePolicy)
-        self.show_words_on_board_l_pushButton = QPushButton(self.groupBox_6)
-        self.show_words_on_board_l_pushButton.setObjectName(u"show_words_on_board_l_pushButton")
-        self.show_words_on_board_l_pushButton.setGeometry(QRect(41, 120, 149, 24))
+        self.show_words_on_board_pushButton = QPushButton(self.groupBox_6)
+        self.show_words_on_board_pushButton.setObjectName(u"show_words_on_board_pushButton")
+        self.show_words_on_board_pushButton.setGeometry(QRect(41, 120, 149, 24))
 
         self.horizontalLayout_2.addWidget(self.groupBox_6)
 
@@ -205,7 +215,7 @@ class UI(object):
         self.groupBox_8.setAlignment(Qt.AlignCenter)
         self.verticalLayoutWidget_3 = QWidget(self.groupBox_8)
         self.verticalLayoutWidget_3.setObjectName(u"verticalLayoutWidget_3")
-        self.verticalLayoutWidget_3.setGeometry(QRect(120, 30, 173, 221))
+        self.verticalLayoutWidget_3.setGeometry(QRect(120, 30, 174, 221))
         self.verticalLayout_11 = QVBoxLayout(self.verticalLayoutWidget_3)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
         self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
@@ -244,7 +254,7 @@ class UI(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 912, 22))
+        self.menubar.setGeometry(QRect(0, 0, 912, 21))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -270,7 +280,7 @@ class UI(object):
         self.show_undistorted_result_pushButton.setText(QCoreApplication.translate("MainWindow", u"1.5 Show result", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("MainWindow", u"2. Augmented reality", None))
         self.show_words_vertical_pushButton.setText(QCoreApplication.translate("MainWindow", u"2.2 show words vertical", None))
-        self.show_words_on_board_l_pushButton.setText(QCoreApplication.translate("MainWindow", u"2.1 show words on board", None))
+        self.show_words_on_board_pushButton.setText(QCoreApplication.translate("MainWindow", u"2.1 show words on board", None))
         self.groupBox_5.setTitle(QCoreApplication.translate("MainWindow", u"3. Stereo disparity map", None))
         self.stereo_disparity_map_pushButton.setText(QCoreApplication.translate("MainWindow", u"3.1 stereo disparity map", None))
         self.groupBox_7.setTitle(QCoreApplication.translate("MainWindow", u"4. SIFT", None))

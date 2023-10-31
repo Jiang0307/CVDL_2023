@@ -19,7 +19,7 @@ def cv2_imread(path):
     img = cv2.imdecode(np.fromfile(path,dtype=np.uint8),-1)
     return img
 
-Q1_IMAGES = []
+IMAGES = []
 NX = 11
 NY = 8
 
@@ -27,7 +27,7 @@ def draw_corner():
     winSize = (5, 5)
     zeroZone = (-1, -1)
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    temp = np.asarray(Q1_IMAGES)
+    temp = np.asarray(IMAGES)
     result = []
     for img in temp:
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -38,7 +38,7 @@ def draw_corner():
     return result
 
 def undistort():
-    temp = np.asarray(Q1_IMAGES)
+    temp = np.asarray(IMAGES)
     objp = np.zeros((1, NX*NY, 3), np.float32)
     objp[0,:,:2] = np.mgrid[0:NX, 0:NY].T.reshape(-1, 2)
     objpoints = []
@@ -53,7 +53,7 @@ def undistort():
             corners2 = cv2.cornerSubPix(gray , corners , (NX,NY) , (-1,-1) , criteria)
             imgpoints.append(corners2)
     ret, intrinsic_matrix , distortion_coefficients , rvecs , tvecs = cv2.calibrateCamera(objpoints , imgpoints , gray.shape[::-1] , None , None)
-    temp = np.asarray(Q1_IMAGES)
+    temp = np.asarray(IMAGES)
     for img in temp:
         h,  w = img.shape[:2]
         newcameramtx, roi = cv2.getOptimalNewCameraMatrix(intrinsic_matrix, distortion_coefficients, (w,h), 1, (w,h))
@@ -64,10 +64,28 @@ def undistort():
         result.append(img)
     return result
 
+def draw_char(img, char_list:list):
+    draw_image = img.copy()
+    for line in char_list:
+        line = line.reshape(2,2)
+        # (0, 0, 255) 为蓝色线条，2 为线条宽度
+        draw_image = cv2.polylines(draw_image, [line], isClosed=False, color=(0, 0 , 255), thickness=5)
+        # draw_image = cv2.line(draw_image, tuple(line[0]), tuple(line[1]), (0,255,0), 10, cv2.LINE_AA)
+    return draw_image
+
 
 class MainWindow(QtWidgets.QMainWindow,UI):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.char_in_board = [ # coordinate for 6 charter in board (x, y) ==> (w, h)
+            [7,5,0], # slot 1
+            [4,5,0], # slot 2
+            [1,5,0], # slot 3
+            [7,2,0], # slot 4
+            [4,2,0], # slot 5
+            [1,2,0]  # slot 6
+        ]
+
 
         self.setup_UI(self)
 #=================================================Question 1=================================================
@@ -79,9 +97,11 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         self.show_undistorted_result_pushButton.clicked.connect(self.Q1_5)
 
 #=================================================Question 2=================================================
-
+        self.show_words_on_board_pushButton.clicked.connect(self.Q2_1)
+        self.show_words_vertical_pushButton.clicked.connect(self.Q2_2)
 
     def load_folder(self):
+        IMAGES.clear()
         self.comboBox.clear()
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
@@ -91,7 +111,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         for file_path in files:
             try:
                 image = cv2.imread(file_path)
-                Q1_IMAGES.append(image)
+                IMAGES.append(image)
                 print(f'Loaded image: {file_path}')
                 self.image_count += 1
             except Exception as e:
@@ -114,7 +134,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 
     def Q1_2(self):
         print("\nprocessing...")
-        self.images = np.asarray(Q1_IMAGES)
+        self.images = np.asarray(IMAGES)
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
         objp[0,:,:2] = np.mgrid[0:NX , 0:NY].T.reshape(-1,2)
@@ -136,7 +156,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
     def Q1_3(self):
         print("\nprocessing...")
         extrinsic_matrices = []
-        self.images = np.asarray(Q1_IMAGES)
+        self.images = np.asarray(IMAGES)
         # 取得index
         index = int( self.comboBox.currentText() )
         if index<0 or index>14:
@@ -170,7 +190,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 
     def Q1_4(self):
         print("\nprocessing...")
-        self.images = np.asarray(Q1_IMAGES)
+        self.images = np.asarray(IMAGES)
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
         objp[0,:,:2] = np.mgrid[0:NX , 0:NY].T.reshape(-1,2)
@@ -191,7 +211,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 
     def Q1_5(self):
         print("processing...")
-        self.images = np.asarray(Q1_IMAGES)
+        self.images = np.asarray(IMAGES)
         result_2_5 = undistort()
 
         title_1 = "Distorted"
@@ -208,6 +228,107 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         cv2.waitKey()
         cv2.destroyAllWindows()
         return        
+
+#=================================================Question 2=================================================
+    def Q2_1(self):
+        print("\nprocessing...")
+        library_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_onboard.yaml") )
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
+        objp = np.zeros((1 , NX*NY , 3) , np.float32)
+        objp[0,:,:2] = np.mgrid[0:NX , 0:NY].T.reshape(-1,2)
+        objpoints = []
+        imgpoints = []
+
+        word = self.lineEdit.text()[:6].upper()
+
+        for img in IMAGES:
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            ret, corners = cv2.findChessboardCorners(gray, (NX,NY), cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FAST_CHECK+cv2.CALIB_CB_NORMALIZE_IMAGE)
+            if ret == True:
+                objpoints.append(objp)
+                corners2 = cv2.cornerSubPix(gray , corners , (NX, NY) , (-1,-1) , criteria)
+                imgpoints.append(corners2)
+
+        for index, image in enumerate(IMAGES):
+            h, w = image.shape[:2]
+            draw_image = image.copy()
+            ret, intrinsic_mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints , imgpoints , (w,h) , None, None)
+            if ret:
+                rvec = np.array(rvecs[index])
+                tvec = np.array(tvecs[index]).reshape(3,1)
+                for i_char, char in enumerate(word):
+                    input  = cv2.FileStorage(library_path , cv2.FILE_STORAGE_READ)
+                    char_matrix = np.float32( input.getNode(char).mat() )
+                    print("char_matrix : ",char_matrix)
+                    line_list = []
+                    for eachline in char_matrix:
+                        ach = np.float32([self.char_in_board[i_char], self.char_in_board[i_char]])
+                        eachline = np.add(eachline, ach)
+                        image_points, jac = cv2.projectPoints(eachline, rvec, tvec, intrinsic_mtx, dist)
+                        line_list.append( np.int32(image_points) )
+                    draw_image = draw_char(draw_image, line_list)
+                cv2.namedWindow("WORD ON BOARD", cv2.WINDOW_GUI_EXPANDED)
+                cv2.imshow("WORD ON BOARD", draw_image)
+                cv2.waitKey(1000)
+        self.setEnabled(True)
+    
+#=================================================Question 3=================================================
+    def Q2_2(self):
+        print("\nprocessing...")
+        library_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_vertical.yaml") )
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
+        objp = np.zeros((1 , NX*NY , 3) , np.float32)
+        objp[0,:,:2] = np.mgrid[0:NX , 0:NY].T.reshape(-1,2)
+        objpoints = []
+        imgpoints = []
+
+        word = self.lineEdit.text()[:6].upper()
+
+        for img in IMAGES:
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            ret, corners = cv2.findChessboardCorners(gray, (NX,NY), cv2.CALIB_CB_ADAPTIVE_THRESH+cv2.CALIB_CB_FAST_CHECK+cv2.CALIB_CB_NORMALIZE_IMAGE)
+            if ret == True:
+                objpoints.append(objp)
+                corners2 = cv2.cornerSubPix(gray , corners , (NX, NY) , (-1,-1) , criteria)
+                imgpoints.append(corners2)
+
+        for index, image in enumerate(IMAGES):
+            h, w = image.shape[:2]
+            draw_image = image.copy()
+            ret, intrinsic_mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints , imgpoints , (w,h) , None, None)
+            if ret:
+                rvec = np.array(rvecs[index])
+                tvec = np.array(tvecs[index]).reshape(3,1)
+                for i_char, char in enumerate(word):
+                    input  = cv2.FileStorage(library_path , cv2.FILE_STORAGE_READ)
+                    char_matrix = np.float32( input.getNode(char).mat() )
+                    print("char_matrix : ",char_matrix)
+                    line_list = []
+                    for eachline in char_matrix:
+                        ach = np.float32([self.char_in_board[i_char], self.char_in_board[i_char]])
+                        eachline = np.add(eachline, ach)
+                        image_points, jac = cv2.projectPoints(eachline, rvec, tvec, intrinsic_mtx, dist)
+                        line_list.append( np.int32(image_points) )
+                    draw_image = draw_char(draw_image, line_list)
+                cv2.namedWindow("WORD ON BOARD", cv2.WINDOW_GUI_EXPANDED)
+                cv2.imshow("WORD ON BOARD", draw_image)
+                cv2.waitKey(1000)
+        self.setEnabled(True)
+
+
+
+
+#=================================================Question 4=================================================
+
+
+
+
+
+
+#=================================================Question 5=================================================
+
+
+
 
 
 if __name__ == "__main__":
