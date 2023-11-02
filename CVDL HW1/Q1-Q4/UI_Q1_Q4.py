@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'HW1ypdhhr.ui'
-##
-## Created by: Qt User Interface Compiler version 6.6.0
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -239,12 +229,14 @@ class UI(object):
 
         self.verticalLayout_11.addWidget(self.show_acc_and_loss_pushButton)
 
-        self.inference_pushButton = QPushButton(self.groupBox_8)
+        self.inference_pushButton = QPushButton(self.verticalLayoutWidget_3)
         self.inference_pushButton.setObjectName(u"inference_pushButton")
-        self.inference_pushButton.setGeometry(QRect(420, 20, 200, 25))
+
+        self.verticalLayout_11.addWidget(self.inference_pushButton)
+
         self.graphicsView = QGraphicsView(self.groupBox_8)
         self.graphicsView.setObjectName(u"graphicsView")
-        self.graphicsView.setGeometry(QRect(420, 50, 200, 200))
+        self.graphicsView.setGeometry(QRect(430, 10, 250, 250))
 
         self.horizontalLayout_3.addWidget(self.groupBox_8)
 
@@ -254,7 +246,7 @@ class UI(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 912, 21))
+        self.menubar.setGeometry(QRect(0, 0, 912, 22))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -288,7 +280,7 @@ class UI(object):
         self.load_image2_pushButton.setText(QCoreApplication.translate("MainWindow", u"Load Image2", None))
         self.keypoints_pushButton.setText(QCoreApplication.translate("MainWindow", u"4.1 Keypoints", None))
         self.matched_keypoints_pushButton.setText(QCoreApplication.translate("MainWindow", u"4.2 Matched keypoints", None))
-        self.groupBox_8.setTitle(QCoreApplication.translate("MainWindow", u"3. Stereo disparity map", None))
+        self.groupBox_8.setTitle(QCoreApplication.translate("MainWindow", u"5. VGG19", None))
         self.load_image_pushButton.setText(QCoreApplication.translate("MainWindow", u"Load Image", None))
         self.show_augmented_images_pushButton.setText(QCoreApplication.translate("MainWindow", u"5.1 Show augmented images", None))
         self.show_model_structure_pushButton.setText(QCoreApplication.translate("MainWindow", u"5.2 Show model structure", None))

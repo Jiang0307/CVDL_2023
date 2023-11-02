@@ -8,11 +8,17 @@ import os
 import math
 import sys
 import cv2
+import glob
+import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
+import torchvision.transforms as transforms
+
 from scipy import signal
 from pathlib import Path
+from PIL import Image
 
+matplotlib.use('TkAgg')
 dataset_path = Path(__file__).parent.parent.joinpath("Dataset")
 
 def cv2_imread(path):
@@ -22,6 +28,14 @@ def cv2_imread(path):
 IMAGES = []
 NX = 11
 NY = 8
+
+def plot_to_image (fig):
+    fig.canvas.draw()
+    width,height = fig.canvas.get_width_height()
+    buffer = np.frombuffer( fig.canvas.tostring_argb(), dtype=np.uint8 )
+    buffer.shape = (width,height,4)
+    buffer = np.roll (buffer,3,axis=2)
+    return buffer
 
 def draw_corner():
     winSize = (5, 5)
@@ -77,6 +91,7 @@ def draw_char(img, char_list:list):
 class MainWindow(QtWidgets.QMainWindow,UI):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.image = None
         self.char_in_board = [ # coordinate for 6 charter in board (x, y) ==> (w, h)
             [7,5,0], # slot 1
             [4,5,0], # slot 2
@@ -95,10 +110,12 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         self.find_extrinsic_pushButton.clicked.connect(self.Q1_3)
         self.find_distortion_pushButton.clicked.connect(self.Q1_4)
         self.show_undistorted_result_pushButton.clicked.connect(self.Q1_5)
-
 #=================================================Question 2=================================================
         self.show_words_on_board_pushButton.clicked.connect(self.Q2_1)
         self.show_words_vertical_pushButton.clicked.connect(self.Q2_2)
+#=================================================Question 5=================================================
+        self.load_image_pushButton.clicked.connect(self.load_image)
+        self.show_augmented_images_pushButton.clicked.connect(self.Q5_1)
 
     def load_folder(self):
         IMAGES.clear()
@@ -119,6 +136,22 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         
         for i in range(self.image_count):
             self.comboBox.addItem(str(i+1))
+
+    def load_image(self):
+        self.image = None
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+        files, _ = QFileDialog.getOpenFileNames(self, "Open Images", "", "Images (*.png *.jpg *.bmp *.jpeg);;All Files (*)", options=options)
+
+        for file_path in files:
+            try:
+                self.image = cv2.imread(file_path)
+                print(f'Loaded image: {file_path}')
+
+            except Exception as e:
+                print(f'Error loading image: {e}')
+
+        print(self.image)
 
     def Q1_1(self):
         title = "2-1"
@@ -272,7 +305,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                 cv2.waitKey(1000)
         self.setEnabled(True)
     
-#=================================================Question 3=================================================
     def Q2_2(self):
         print("\nprocessing...")
         library_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_vertical.yaml") )
@@ -315,7 +347,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                 cv2.waitKey(1000)
         self.setEnabled(True)
 
-
+#=================================================Question 3=================================================
 
 
 #=================================================Question 4=================================================
@@ -326,10 +358,42 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 
 
 #=================================================Question 5=================================================
+    def Q5_1(self):
+        image_path = str( dataset_path.joinpath("Q5_Image").joinpath("Q5_1").joinpath("*.png") )
+        all_path = glob.glob(image_path)
+        images = []
+        names = []
+        augmented_images = []
 
+        for path in all_path:
+            filename = str(Path(path).stem)
+            # print(filename)
+            img = Image.open(path)
+            images.append(img)
+            names.append(filename)
 
+        transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(),  # 随机水平翻转
+            transforms.RandomVerticalFlip(),  # 随机水平翻转
+            transforms.RandomRotation(30) # 随机旋转（-30到30度之间）
+        ])
 
+        for image in images:
+            augmented_image = transform(image)
+            augmented_images.append(augmented_image)
+        
+        fig = plt.figure("5-1",figsize=(15,15))
+        for i in range(9):
+            plt.subplot(3,3,i+1)
+            plt.title(names[i]) 
+            plt.imshow(augmented_images[i])
 
+        img = plot_to_image(fig)
+        plt.close(fig)
+        cv2.imshow("5-1",img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        return
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
