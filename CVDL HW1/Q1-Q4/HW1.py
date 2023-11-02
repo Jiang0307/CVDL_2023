@@ -2,7 +2,7 @@ from math import sqrt
 from typing import Pattern
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
-from UI_Q1_Q4 import UI
+from HW1_UI import UI
 
 import os
 import math
@@ -12,7 +12,7 @@ import glob
 import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
-import torchvision.transforms as transforms
+# import torchvision.transforms as transforms
 
 from scipy import signal
 from pathlib import Path
@@ -87,6 +87,27 @@ def draw_char(img, char_list:list):
         # draw_image = cv2.line(draw_image, tuple(line[0]), tuple(line[1]), (0,255,0), 10, cv2.LINE_AA)
     return draw_image
 
+def match_keypoints(img1, img2):
+    sift = cv2.SIFT_create()
+    grayimg1 = cv2.cvtColor(img1, cv2.COLOR_RGB2GRAY)
+    grayimg2 = cv2.cvtColor(img2, cv2.COLOR_RGB2GRAY)
+    kp1,des1 = sift.detectAndCompute(img1,None)
+    kp2,des2 = sift.detectAndCompute(img2,None)
+    bf = cv2.BFMatcher.create()
+    matches = bf.knnMatch(des1,des2,k=2)
+    matchesMask = [[0, 0] for i in range(len(matches))]
+    for i, (m, n) in enumerate(matches):
+        if m.distance < 0.75*n.distance:
+            matchesMask[i] = [1, 0]
+    drawpara = dict(singlePointColor=(0, 255, 0), matchesMask=matchesMask, flags=2)
+    return cv2.drawMatchesKnn(grayimg1, kp1, grayimg2, kp2, matches, None, **drawpara)
+
+    
+def resizeImage(img):
+    height = 400
+    h,w = img.shape[:2]
+    width = int (height * (w/h))
+    return cv2.resize(img,(width,height))
 
 class MainWindow(QtWidgets.QMainWindow,UI):
     def __init__(self, parent=None):
@@ -113,9 +134,20 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 #=================================================Question 2=================================================
         self.show_words_on_board_pushButton.clicked.connect(self.Q2_1)
         self.show_words_vertical_pushButton.clicked.connect(self.Q2_2)
+
+#=================================================Question 3=================================================
+        self.load_image_l_pushButton.clicked.connect(self.load_image_l)
+        self.load_image_r_pushButton.clicked.connect(self.load_image_r)
+        self.stereo_disparity_map_pushButton.clicked.connect(self.Q3_1)
+
+#=================================================Question 4=================================================
+        self.load_image1_pushButton.clicked.connect(self.load_image1)
+        self.load_image2_pushButton.clicked.connect(self.load_image2)
+        self.keypoints_pushButton.clicked.connect(self.Q4_1)
+        self.matched_keypoints_pushButton.clicked.connect(self.Q4_2)
 #=================================================Question 5=================================================
         self.load_image_pushButton.clicked.connect(self.load_image)
-        self.show_augmented_images_pushButton.clicked.connect(self.Q5_1)
+        self.show_augmented_images_pushButton.clicked.connect(self.Q4_1)
 
     def load_folder(self):
         IMAGES.clear()
@@ -166,7 +198,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         return
 
     def Q1_2(self):
-        print("\nprocessing...")
+        print("\nProcessing...")
         self.images = np.asarray(IMAGES)
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
@@ -187,7 +219,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         return
     
     def Q1_3(self):
-        print("\nprocessing...")
+        print("\nProcessing...")
         extrinsic_matrices = []
         self.images = np.asarray(IMAGES)
         # 取得index
@@ -222,7 +254,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         return
 
     def Q1_4(self):
-        print("\nprocessing...")
+        print("\nProcessing...")
         self.images = np.asarray(IMAGES)
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
@@ -264,7 +296,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 
 #=================================================Question 2=================================================
     def Q2_1(self):
-        print("\nprocessing...")
+        print("\nProcessing...")
         library_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_onboard.yaml") )
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
@@ -300,13 +332,14 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                         image_points, jac = cv2.projectPoints(eachline, rvec, tvec, intrinsic_mtx, dist)
                         line_list.append( np.int32(image_points) )
                     draw_image = draw_char(draw_image, line_list)
-                cv2.namedWindow("WORD ON BOARD", cv2.WINDOW_GUI_EXPANDED)
-                cv2.imshow("WORD ON BOARD", draw_image)
+                cv2.namedWindow("2-1", cv2.WINDOW_GUI_EXPANDED)
+                cv2.imshow("2-1", draw_image)
                 cv2.waitKey(1000)
+        cv2.destroyAllWindows()
         self.setEnabled(True)
     
     def Q2_2(self):
-        print("\nprocessing...")
+        print("\nProcessing...")
         library_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_vertical.yaml") )
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
@@ -342,58 +375,135 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                         image_points, jac = cv2.projectPoints(eachline, rvec, tvec, intrinsic_mtx, dist)
                         line_list.append( np.int32(image_points) )
                     draw_image = draw_char(draw_image, line_list)
-                cv2.namedWindow("WORD ON BOARD", cv2.WINDOW_GUI_EXPANDED)
-                cv2.imshow("WORD ON BOARD", draw_image)
+                cv2.namedWindow("2-2", cv2.WINDOW_GUI_EXPANDED)
+                cv2.imshow("2-2", draw_image)
                 cv2.waitKey(1000)
+        cv2.destroyAllWindows() 
         self.setEnabled(True)
 
 #=================================================Question 3=================================================
+    def load_image_l(self):
+        image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
+        self.image_L = cv2_imread(image_path)
+        print("\nLoad Image_L")
+
+    def load_image_r(self):
+        image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
+        self.image_R = cv2_imread(image_path)
+        print("\nLoad Image_L")
+    
+    def click_event(self,event, x, y, flags, params): 
+        if(event == cv2.EVENT_LBUTTONDOWN):
+            img = cv2.normalize(self.disparity_map, None, alpha = 0, beta = 255, norm_type = cv2.NORM_MINMAX, dtype = cv2.CV_32F)
+            originalHeight, originalWidth = self.image_L.shape[:2]
+            height, width = 400 , int((originalWidth / originalHeight) * 400)      
+            x = int((x / width) * originalWidth)
+            y = int((y / height) * originalHeight)
+            if(img[y,x] == 0):
+                print('Failure case')
+                cv2.imshow('image_R',resizeImage(self.image_R))
+                return
+            dis = self.disparity_map[y,x] // 16
+            x -= dis
+            print('({},{}),dis:{:.2f}'.format(x,y,abs(dis)))
+            img = cv2.circle(self.image_R.copy(), (x,y), 5, (0, 0, 255), -1)
+            cv2.imshow('image_R', resizeImage(img))
+            return
+    
+    def Q3_1(self):
+        stereo_BM = cv2.StereoBM.create(numDisparities=256, blockSize=25)
+        gray_image_L = cv2.cvtColor(self.image_L, cv2.COLOR_RGB2GRAY)
+        gray_image_R = cv2.cvtColor(self.image_R, cv2.COLOR_RGB2GRAY)
+
+        self.disparity_map = stereo_BM.compute(gray_image_L , gray_image_R)
+        image = cv2.normalize(self.disparity_map, None, alpha = 0, beta = 255, norm_type = cv2.NORM_MINMAX, dtype = cv2.CV_32F)
+        image =  image.astype(np.uint8)
+        
+        cv2.imshow('image_L',resizeImage(self.image_L))
+        cv2.imshow('image_R',resizeImage(self.image_R))
+        cv2.imshow('disparity',resizeImage(image))
+        cv2.setMouseCallback('image_L', self.click_event) 
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        
 
 
 #=================================================Question 4=================================================
+    def load_image1(self):
+        image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
+        self.image_1 = cv2_imread(image_path)
+        print("\nLoad Image_1")
+
+    def load_image2(self):
+        image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
+        # image_path = str( dataset_path.joinpath("Q4_Image").joinpath("Right.jpg") )
+        self.image_2 = cv2_imread(image_path)
+        print("\nLoad Image_2")
+
+    def Q4_1(self):
+        print("\nProcessing...")
+
+        sift = cv2.SIFT_create()
+        gray_image = cv2.cvtColor(self.image_1, cv2.COLOR_RGB2GRAY)
+
+        keypoints , descriptors = sift.detectAndCompute(gray_image,None)
+        result = cv2.drawKeypoints(gray_image , keypoints , None , color=[0,255,0])
+        cv2.namedWindow("4-1", cv2.WINDOW_GUI_EXPANDED)
+        cv2.imshow("4-1", result)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 
+    def Q4_2(self):
+        print("\nProcessing...")
+        sift = cv2.SIFT_create()
+        result = match_keypoints(self.image_1 , self.image_2)
 
+        cv2.namedWindow("4-2", cv2.WINDOW_GUI_EXPANDED)
+        cv2.imshow("4-2", result)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 
 
 #=================================================Question 5=================================================
-    def Q5_1(self):
-        image_path = str( dataset_path.joinpath("Q5_Image").joinpath("Q5_1").joinpath("*.png") )
-        all_path = glob.glob(image_path)
-        images = []
-        names = []
-        augmented_images = []
+    # def Q5_1(self):
+    #     image_path = str( dataset_path.joinpath("Q5_Image").joinpath("Q5_1").joinpath("*.png") )
+    #     all_path = glob.glob(image_path)
+    #     images = []
+    #     names = []
+    #     augmented_images = []
 
-        for path in all_path:
-            filename = str(Path(path).stem)
-            # print(filename)
-            img = Image.open(path)
-            images.append(img)
-            names.append(filename)
+    #     for path in all_path:
+    #         filename = str(Path(path).stem)
+    #         # print(filename)
+    #         img = Image.open(path)
+    #         images.append(img)
+    #         names.append(filename)
 
-        transform = transforms.Compose([
-            transforms.RandomHorizontalFlip(),  # 随机水平翻转
-            transforms.RandomVerticalFlip(),  # 随机水平翻转
-            transforms.RandomRotation(30) # 随机旋转（-30到30度之间）
-        ])
+    #     transform = transforms.Compose([
+    #         transforms.RandomHorizontalFlip(),  # 随机水平翻转
+    #         transforms.RandomVerticalFlip(),  # 随机水平翻转
+    #         transforms.RandomRotation(30) # 随机旋转（-30到30度之间）
+    #     ])
 
-        for image in images:
-            augmented_image = transform(image)
-            augmented_images.append(augmented_image)
+    #     for image in images:
+    #         augmented_image = transform(image)
+    #         augmented_images.append(augmented_image)
         
-        fig = plt.figure("5-1",figsize=(15,15))
-        for i in range(9):
-            plt.subplot(3,3,i+1)
-            plt.title(names[i]) 
-            plt.imshow(augmented_images[i])
+    #     fig = plt.figure("5-1",figsize=(15,15))
+    #     for i in range(9):
+    #         plt.subplot(3,3,i+1)
+    #         plt.title(names[i]) 
+    #         plt.imshow(augmented_images[i])
 
-        img = plot_to_image(fig)
-        plt.close(fig)
-        cv2.imshow("5-1",img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        return
+    #     img = plot_to_image(fig)
+    #     plt.close(fig)
+    #     cv2.imshow("5-1",img)
+    #     cv2.waitKey(0)
+    #     cv2.destroyAllWindows()
+    #     return
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
