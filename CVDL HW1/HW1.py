@@ -2,6 +2,8 @@ from math import sqrt
 from typing import Pattern
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
+from PySide6.QtGui import QPixmap, QImage, QImageReader
+
 from HW1_UI import UI
 
 import os
@@ -10,24 +12,33 @@ import sys
 import cv2
 import glob
 import matplotlib
+import torch
+import torchvision
 import numpy as np
 import matplotlib.pyplot as plt
-# import torchvision.transforms as transforms
+import torchvision.transforms as transforms
+import torch.nn as nn
 
 from scipy import signal
 from pathlib import Path
 from PIL import Image
+from torchsummary import summary
+from torchvision.models import vgg19_bn
 
 matplotlib.use('TkAgg')
-dataset_path = Path(__file__).parent.parent.joinpath("Dataset")
-
-def cv2_imread(path):
-    img = cv2.imdecode(np.fromfile(path,dtype=np.uint8),-1)
-    return img
+dataset_path = Path(__file__).parent.joinpath("Dataset")
+training_path = Path(__file__).parent.joinpath("Training")
+print("dataset_path : ",dataset_path)
 
 IMAGES = []
 NX = 11
 NY = 8
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+label_dict = {0:"airplane" , 1:"automobile" , 2:"bird" , 3:"cat" , 4:"deer" , 5:"dog" , 6:"frog" , 7:"horse" , 8:"ship" , 9:"truck"}
+
+def cv2_imread(path):
+    img = cv2.imdecode(np.fromfile(path,dtype=np.uint8),-1)
+    return img
 
 def plot_to_image (fig):
     fig.canvas.draw()
@@ -109,6 +120,44 @@ def resizeImage(img):
     width = int (height * (w/h))
     return cv2.resize(img,(width,height))
 
+class VGG19BN(nn.Module):
+    def __init__(self):
+        super(VGG19BN, self).__init__()
+        self.vgg19_bn = torchvision.models.vgg19_bn(num_classes=10)
+        self.features = self.vgg19_bn.features
+        self.classifier = nn.Sequential(
+            nn.Linear(512, 512),  # 减少了第一个全连接层的单元数
+            nn.ReLU(True),
+            nn.BatchNorm1d(512),
+            nn.Dropout(),
+            nn.Linear(512, 10)  # 减少了第二个全连接层的单元数
+        )
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        for m in self.classifier:
+            if isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, mean=0, std=0.01)
+                nn.init.constant_(m.bias, 0)
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.classifier(x)
+        return x
+
+    def _make_layers(self, cfg):
+        layers = []
+        in_channels = 3
+        for x in cfg:
+            if x == 'M':
+                layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
+            else:
+                layers += [nn.Conv2d(in_channels, x, kernel_size=3, padding=1), nn.BatchNorm2d(x), nn.ReLU(inplace=True)]
+                in_channels = x
+        layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
+        return nn.Sequential(*layers)
+
 class MainWindow(QtWidgets.QMainWindow,UI):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -147,7 +196,11 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         self.matched_keypoints_pushButton.clicked.connect(self.Q4_2)
 #=================================================Question 5=================================================
         self.load_image_pushButton.clicked.connect(self.load_image)
-        self.show_augmented_images_pushButton.clicked.connect(self.Q4_1)
+        self.show_augmented_images_pushButton.clicked.connect(self.Q5_1)
+        self.show_model_structure_pushButton.clicked.connect(self.Q5_2)
+        self.show_acc_and_loss_pushButton.clicked.connect(self.Q5_3)
+        self.inference_pushButton.clicked.connect(self.Q5_4)
+        
 
     def load_folder(self):
         IMAGES.clear()
@@ -169,26 +222,27 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         for i in range(self.image_count):
             self.comboBox.addItem(str(i+1))
 
+    def show_on_label(self):
+        q_image = QImage(self.image_inference.tobytes(), self.image_inference.width, self.image_inference.height, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(q_image)
+        label_width = self.image_label.width()
+        label_height = self.image_label.height()
+        pixmap = pixmap.scaled(label_width, label_height)
+        self.image_label.setPixmap(pixmap)
+        self.image_label.setScaledContents(True)
+
     def load_image(self):
-        self.image = None
-        options = QFileDialog.Options()
-        options |= QFileDialog.ReadOnly
-        files, _ = QFileDialog.getOpenFileNames(self, "Open Images", "", "Images (*.png *.jpg *.bmp *.jpeg);;All Files (*)", options=options)
-
-        for file_path in files:
-            try:
-                self.image = cv2.imread(file_path)
-                print(f'Loaded image: {file_path}')
-
-            except Exception as e:
-                print(f'Error loading image: {e}')
-
-        print(self.image)
+        self.inference_label.clear()
+        image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
+        # self.image_inference = cv2_imread(image_path)
+        self.image_inference = Image.open(image_path)
+        print("\nLoad Image_inference")
+        self.show_on_label()
 
     def Q1_1(self):
-        title = "2-1"
-        result_2_1 = draw_corner()
-        for img in result_2_1:
+        title = "1-1"
+        result = draw_corner()
+        for img in result:
             cv2.namedWindow(title , cv2.WINDOW_NORMAL)
             cv2.resizeWindow(title , 1500 , 1500)
             cv2.imshow(title , img)
@@ -437,7 +491,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 
     def load_image2(self):
         image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
-        # image_path = str( dataset_path.joinpath("Q4_Image").joinpath("Right.jpg") )
         self.image_2 = cv2_imread(image_path)
         print("\nLoad Image_2")
 
@@ -468,42 +521,107 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 
 
 #=================================================Question 5=================================================
-    # def Q5_1(self):
-    #     image_path = str( dataset_path.joinpath("Q5_Image").joinpath("Q5_1").joinpath("*.png") )
-    #     all_path = glob.glob(image_path)
-    #     images = []
-    #     names = []
-    #     augmented_images = []
+    def load_model(self):
+        model = VGG19BN().to(DEVICE)
+        checkpoint_path = str(training_path.joinpath("model.pth"))
+        model.load_state_dict(torch.load(checkpoint_path))
+        # model = torch.load(model_path , map_location=DEVICE)
+        model.eval()
+        return model
 
-    #     for path in all_path:
-    #         filename = str(Path(path).stem)
-    #         # print(filename)
-    #         img = Image.open(path)
-    #         images.append(img)
-    #         names.append(filename)
+    def preprocess(self , img):
+        # img = Image.open(img_path)
+        test_transforms = transforms.Compose([transforms.Resize((32,32)),transforms.ToTensor()])
+        image_tensor = test_transforms(img)
+        image_tensor = image_tensor.unsqueeze(0)
+        image_tensor = image_tensor.to(DEVICE) 
+        return image_tensor
 
-    #     transform = transforms.Compose([
-    #         transforms.RandomHorizontalFlip(),  # 随机水平翻转
-    #         transforms.RandomVerticalFlip(),  # 随机水平翻转
-    #         transforms.RandomRotation(30) # 随机旋转（-30到30度之间）
-    #     ])
+    def predict(self, model, test_data):
+        output_tensor = model(test_data)
+        probabilities = torch.nn.functional.softmax(output_tensor, dim=1)[0]
+        predicted_class = torch.argmax(probabilities).item()
+        predicted_label = label_dict[predicted_class]
 
-    #     for image in images:
-    #         augmented_image = transform(image)
-    #         augmented_images.append(augmented_image)
+        return predicted_label , probabilities
+
+    def start_prediction(self , model):
+        test_data = self.preprocess(self.image_inference)
+        result , probabilities = self.predict(model , test_data)
+        return result , probabilities
+    
+    
+    def Q5_1(self):
+        image_path = str( dataset_path.joinpath("Q5_Image").joinpath("Q5_1").joinpath("*.png") )
+        all_path = glob.glob(image_path)
+        images = []
+        names = []
+        augmented_images = []
+
+        for path in all_path:
+            filename = str(Path(path).stem)
+            # print(filename)
+            img = Image.open(path)
+            images.append(img)
+            names.append(filename)
+
+        transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(),  # 随机水平翻转
+            transforms.RandomVerticalFlip(),  # 随机水平翻转
+            transforms.RandomRotation(30) # 随机旋转（-30到30度之间）
+        ])
+
+        for image in images:
+            augmented_image = transform(image)
+            augmented_images.append(augmented_image)
         
-    #     fig = plt.figure("5-1",figsize=(15,15))
-    #     for i in range(9):
-    #         plt.subplot(3,3,i+1)
-    #         plt.title(names[i]) 
-    #         plt.imshow(augmented_images[i])
+        fig = plt.figure("5-1",figsize=(15,15))
+        for i in range(9):
+            plt.subplot(3,3,i+1)
+            plt.title(names[i]) 
+            plt.imshow(augmented_images[i])
 
-    #     img = plot_to_image(fig)
-    #     plt.close(fig)
-    #     cv2.imshow("5-1",img)
-    #     cv2.waitKey(0)
-    #     cv2.destroyAllWindows()
-    #     return
+        img = plot_to_image(fig)
+        plt.close(fig)
+        cv2.imshow("5-1",img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    
+    def Q5_2(self):
+        model = VGG19BN().to(DEVICE)
+        summary(model, input_size=(3, 32 , 32) )
+
+    def Q5_3(self):
+        figure_path = str(training_path.joinpath("accuracy and loss.png"))
+        figure = cv2_imread(figure_path)
+        cv2.imshow("5-3",figure)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        
+    def Q5_4(self):
+        print("\nStart Inference")
+        model = self.load_model()
+        result , probabilities = self.start_prediction(model)
+        text = "Predicted : " + result
+        self.inference_label.setText(text)
+        
+        # 绘制概率分布图
+        classes = list(label_dict.values())
+        probs = probabilities.cpu().detach().numpy()
+        
+        fig = plt.figure("5-4", figsize=(15, 15))
+        plt.bar(classes, probs, color='skyblue')
+        plt.xlabel('Class')
+        plt.ylabel('Probability')
+        plt.title('Class Probability Distribution')
+
+        # 将fig转换为图像
+        image = plot_to_image(fig)
+
+        # 使用OpenCV显示图像
+        cv2.imshow('Probability Distribution', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])

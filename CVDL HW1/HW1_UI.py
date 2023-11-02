@@ -5,8 +5,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QGraphicsView, QGroupBox,
-    QHBoxLayout, QLineEdit, QMainWindow, QMenuBar,
+from PySide6.QtWidgets import (QApplication, QComboBox, QGroupBox, QHBoxLayout,
+    QLabel, QLineEdit, QMainWindow, QMenuBar,
     QPushButton, QSizePolicy, QStatusBar, QVBoxLayout,
     QWidget)
 
@@ -205,7 +205,7 @@ class UI(object):
         self.groupBox_8.setAlignment(Qt.AlignCenter)
         self.verticalLayoutWidget_3 = QWidget(self.groupBox_8)
         self.verticalLayoutWidget_3.setObjectName(u"verticalLayoutWidget_3")
-        self.verticalLayoutWidget_3.setGeometry(QRect(120, 30, 174, 221))
+        self.verticalLayoutWidget_3.setGeometry(QRect(20, 30, 174, 221))
         self.verticalLayout_11 = QVBoxLayout(self.verticalLayoutWidget_3)
         self.verticalLayout_11.setObjectName(u"verticalLayout_11")
         self.verticalLayout_11.setContentsMargins(0, 0, 0, 0)
@@ -234,9 +234,18 @@ class UI(object):
 
         self.verticalLayout_11.addWidget(self.inference_pushButton)
 
-        self.graphicsView = QGraphicsView(self.groupBox_8)
-        self.graphicsView.setObjectName(u"graphicsView")
-        self.graphicsView.setGeometry(QRect(430, 10, 250, 250))
+        self.image_label = QLabel(self.groupBox_8)
+        self.image_label.setObjectName(u"image_label")
+        self.image_label.setGeometry(QRect(430, 0, 256, 256))
+        self.image_label.setAlignment(Qt.AlignCenter)
+        self.inference_label = QLabel(self.groupBox_8)
+        self.inference_label.setObjectName(u"inference_label")
+        self.inference_label.setGeometry(QRect(210, 125, 211, 31))
+        font = QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        self.inference_label.setFont(font)
+        self.inference_label.setAlignment(Qt.AlignCenter)
 
         self.horizontalLayout_3.addWidget(self.groupBox_8)
 
@@ -286,5 +295,5 @@ class UI(object):
         self.show_model_structure_pushButton.setText(QCoreApplication.translate("MainWindow", u"5.2 Show model structure", None))
         self.show_acc_and_loss_pushButton.setText(QCoreApplication.translate("MainWindow", u"5.3 Show acc and loss", None))
         self.inference_pushButton.setText(QCoreApplication.translate("MainWindow", u"5.4 Inference", None))
-    # retranslateUi
-
+        self.image_label.setText("")
+        self.inference_label.setText("")
