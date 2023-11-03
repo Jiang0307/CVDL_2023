@@ -28,7 +28,6 @@ from torchvision.models import vgg19_bn
 matplotlib.use('TkAgg')
 dataset_path = Path(__file__).parent.joinpath("Dataset")
 training_path = Path(__file__).parent.joinpath("Training")
-print("dataset_path : ",dataset_path)
 
 IMAGES = []
 NX = 11

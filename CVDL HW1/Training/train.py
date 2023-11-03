@@ -11,7 +11,7 @@ from tqdm import tqdm
 from pathlib import Path
 from torchvision.models import vgg19_bn
 
-download=False
+DOWNLOAD = True
 save_path = str(Path(__file__).joinpath("model.pth"))
 matplotlib.use('TkAgg')
 
@@ -23,9 +23,9 @@ transform = transforms.Compose([
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ])
 
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True,download=False, transform=transform)
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True,download=DOWNLOAD, transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,shuffle=True, num_workers=2)
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=False, transform=transform)
+testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=DOWNLOAD, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
 # Step 2: Define the model (VGG19 with Batch Normalization)
@@ -56,7 +56,7 @@ class VGG19BN(nn.Module):
         return x
 
 if __name__ == "__main__":
-    save_path = str( Path(__file__).parent.joinpath("best_model.pth") )
+    save_path = str( Path(__file__).parent.joinpath("model.pth") )
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = VGG19BN().to(device)
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=5e-4)
 
     # Step 4: Training loop
-    num_epochs = 50
+    num_epochs = 100
     best_accuracy = 0.0
 
     train_loss_list = []
