@@ -11,7 +11,7 @@ from tqdm import tqdm
 from pathlib import Path
 from torchvision.models import vgg19_bn
 
-DOWNLOAD = True
+DOWNLOAD = False
 save_path = str(Path(__file__).joinpath("model.pth"))
 matplotlib.use('TkAgg')
 
