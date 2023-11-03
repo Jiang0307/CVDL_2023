@@ -1,11 +1,3 @@
-from math import sqrt
-from typing import Pattern
-from PySide6 import QtWidgets, QtGui, QtCore
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
-from PySide6.QtGui import QPixmap, QImage, QImageReader
-
-from HW1_UI import UI
-
 import os
 import math
 import sys
@@ -19,6 +11,12 @@ import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
 import torch.nn as nn
 
+from HW1_UI import UI
+from math import sqrt
+from typing import Pattern
+from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
+from PySide6.QtGui import QPixmap, QImage, QImageReader
 from scipy import signal
 from pathlib import Path
 from PIL import Image
@@ -92,9 +90,7 @@ def draw_char(img, char_list:list):
     draw_image = img.copy()
     for line in char_list:
         line = line.reshape(2,2)
-        # (0, 0, 255) 为蓝色线条，2 为线条宽度
         draw_image = cv2.polylines(draw_image, [line], isClosed=False, color=(0, 0 , 255), thickness=5)
-        # draw_image = cv2.line(draw_image, tuple(line[0]), tuple(line[1]), (0,255,0), 10, cv2.LINE_AA)
     return draw_image
 
 def match_keypoints(img1, img2):
@@ -112,7 +108,6 @@ def match_keypoints(img1, img2):
     drawpara = dict(singlePointColor=(0, 255, 0), matchesMask=matchesMask, flags=2)
     return cv2.drawMatchesKnn(grayimg1, kp1, grayimg2, kp2, matches, None, **drawpara)
 
-    
 def resizeImage(img):
     height = 400
     h,w = img.shape[:2]
@@ -125,11 +120,11 @@ class VGG19BN(nn.Module):
         self.vgg19_bn = torchvision.models.vgg19_bn(num_classes=10)
         self.features = self.vgg19_bn.features
         self.classifier = nn.Sequential(
-            nn.Linear(512, 512),  # 减少了第一个全连接层的单元数
+            nn.Linear(512, 512),
             nn.ReLU(True),
             nn.BatchNorm1d(512),
             nn.Dropout(),
-            nn.Linear(512, 10)  # 减少了第二个全连接层的单元数
+            nn.Linear(512, 10)
         )
         self._initialize_weights()
 
@@ -169,8 +164,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
             [4,2,0], # slot 5
             [1,2,0]  # slot 6
         ]
-
-
         self.setup_UI(self)
 #=================================================Question 1=================================================
         self.load_foler_pushButton.clicked.connect(self.load_folder)
@@ -233,7 +226,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
     def load_image(self):
         self.inference_label.clear()
         image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
-        # self.image_inference = cv2_imread(image_path)
         self.image_inference = Image.open(image_path)
         print("\nLoad Image_inference")
         self.show_on_label()
@@ -479,9 +471,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-        
-
-
 #=================================================Question 4=================================================
     def load_image1(self):
         image_path , _ = QFileDialog.getOpenFileName(None, "選擇圖片", "", "Images (*.png *.jpg *.bmp)")
@@ -506,7 +495,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
-
     def Q4_2(self):
         print("\nProcessing...")
         sift = cv2.SIFT_create()
@@ -516,8 +504,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         cv2.imshow("4-2", result)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-
-
 
 #=================================================Question 5=================================================
     def load_model(self):
@@ -548,7 +534,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         test_data = self.preprocess(self.image_inference)
         result , probabilities = self.predict(model , test_data)
         return result , probabilities
-    
     
     def Q5_1(self):
         image_path = str( dataset_path.joinpath("Q5_Image").joinpath("Q5_1").joinpath("*.png") )
@@ -604,7 +589,6 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         text = "Predicted : " + result
         self.inference_label.setText(text)
         
-        # 绘制概率分布图
         classes = list(label_dict.values())
         probs = probabilities.cpu().detach().numpy()
         
@@ -613,11 +597,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         plt.xlabel('Class')
         plt.ylabel('Probability')
         plt.title('Class Probability Distribution')
-
-        # 将fig转换为图像
         image = plot_to_image(fig)
-
-        # 使用OpenCV显示图像
         cv2.imshow('Probability Distribution', image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()

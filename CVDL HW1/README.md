@@ -1,7 +1,4 @@
-# CVDL_2023
-
-## install packages
-pip install requirements.txt
+# HW1
 
 ## execute
 python HW1.py
