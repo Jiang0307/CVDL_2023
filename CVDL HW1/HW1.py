@@ -601,6 +601,10 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         cv2.imshow('Probability Distribution', image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+        
+        # 加下面這行
+        plt.close(fig)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
