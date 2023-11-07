@@ -509,13 +509,11 @@ class MainWindow(QtWidgets.QMainWindow,UI):
     def load_model(self):
         model = VGG19BN().to(DEVICE)
         checkpoint_path = str(training_path.joinpath("model.pth"))
-        model.load_state_dict(torch.load(checkpoint_path))
-        # model = torch.load(model_path , map_location=DEVICE)
+        model.load_state_dict(torch.load(checkpoint_path , map_location=DEVICE))
         model.eval()
         return model
 
     def preprocess(self , img):
-        # img = Image.open(img_path)
         test_transforms = transforms.Compose([transforms.Resize((32,32)),transforms.ToTensor()])
         image_tensor = test_transforms(img)
         image_tensor = image_tensor.unsqueeze(0)
