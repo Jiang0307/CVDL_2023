@@ -268,7 +268,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         extrinsic_matrices = []
         self.images = np.asarray(IMAGES)
         # 取得index
-        index = int( self.comboBox.currentText() )
+        index = int( self.comboBox.currentText() ) - 1
         if index<0 or index>14:
             return
         
