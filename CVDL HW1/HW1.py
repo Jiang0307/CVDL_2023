@@ -316,7 +316,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                 imgpoints.append(corners2)
         ret, intrinsic_matrix , distortion_coefficients , rvecs , tvecs = cv2.calibrateCamera(objpoints , imgpoints , gray.shape[::-1] , None , None)
         print("Distortion : ")
-        print(intrinsic_matrix)
+        print(distortion_coefficients)
         print("")
         return
 
