@@ -6,6 +6,7 @@ import glob
 import matplotlib
 import torch
 import torchvision
+import shutil
 import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
@@ -315,7 +316,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                 imgpoints.append(corners2)
         ret, intrinsic_matrix , distortion_coefficients , rvecs , tvecs = cv2.calibrateCamera(objpoints , imgpoints , gray.shape[::-1] , None , None)
         print("Distortion : ")
-        print(intrinsic_matrix)
+        print(distortion_coefficients)
         print("")
         return
 
@@ -342,7 +343,9 @@ class MainWindow(QtWidgets.QMainWindow,UI):
 #=================================================Question 2=================================================
     def Q2_1(self):
         print("\nProcessing...")
-        library_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_onboard.yaml") )
+        library_txt_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_onboard.txt") )
+        library_yaml_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_onboard.yaml") )
+        shutil.copyfile(library_txt_path, library_yaml_path)
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
         objp[0,:,:2] = np.mgrid[0:NX , 0:NY].T.reshape(-1,2)
@@ -367,7 +370,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                 rvec = np.array(rvecs[index])
                 tvec = np.array(tvecs[index]).reshape(3,1)
                 for i_char, char in enumerate(word):
-                    input  = cv2.FileStorage(library_path , cv2.FILE_STORAGE_READ)
+                    input  = cv2.FileStorage(library_yaml_path , cv2.FILE_STORAGE_READ)
                     char_matrix = np.float32( input.getNode(char).mat() )
                     print("char_matrix : ",char_matrix)
                     line_list = []
@@ -385,7 +388,10 @@ class MainWindow(QtWidgets.QMainWindow,UI):
     
     def Q2_2(self):
         print("\nProcessing...")
-        library_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_vertical.yaml") )
+        library_txt_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_vertical.txt") )
+        library_yaml_path = str( dataset_path.joinpath("Q2_Image").joinpath("Q2_lib").joinpath("alphabet_lib_vertical.yaml") )
+        shutil.copyfile(library_txt_path, library_yaml_path)
+
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER , 30 , 0.001)
         objp = np.zeros((1 , NX*NY , 3) , np.float32)
         objp[0,:,:2] = np.mgrid[0:NX , 0:NY].T.reshape(-1,2)
@@ -410,7 +416,7 @@ class MainWindow(QtWidgets.QMainWindow,UI):
                 rvec = np.array(rvecs[index])
                 tvec = np.array(tvecs[index]).reshape(3,1)
                 for i_char, char in enumerate(word):
-                    input  = cv2.FileStorage(library_path , cv2.FILE_STORAGE_READ)
+                    input  = cv2.FileStorage(library_yaml_path , cv2.FILE_STORAGE_READ)
                     char_matrix = np.float32( input.getNode(char).mat() )
                     print("char_matrix : ",char_matrix)
                     line_list = []
@@ -599,9 +605,12 @@ class MainWindow(QtWidgets.QMainWindow,UI):
         cv2.imshow('Probability Distribution', image)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+
         
         # 加下面這行
         plt.close(fig)
+
+
 
 
 if __name__ == "__main__":
